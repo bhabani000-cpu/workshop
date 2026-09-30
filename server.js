@@ -29,7 +29,7 @@ app.get('/products', async (req, res) => {
 // GET /products/:id - Get product by ID
 app.get('/products/:id', async (req, res) => {
   try {
-    const products = await getProductsData();
+    const products = await readFileWithDelay();
     const productId =req.params.id;
     const product = products.find((p) => p.id == productId);
 
@@ -43,6 +43,13 @@ app.get('/products/:id', async (req, res) => {
   }
 });
 
+async function readFileWithDelay(){
+    await new Promise((res,rej)=>{
+        setTimeout(res,1500)
+    })
+    let products = await getProductsData()
+    return products
+}
 
 
 app.listen(PORT, () => {
