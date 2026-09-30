@@ -5,6 +5,9 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Simple in-memory cache object
+const cache = {};
+
 // Helper function to read products from db.json asynchronously
 const getProductsData = async () => {
   try {
@@ -16,10 +19,19 @@ const getProductsData = async () => {
   }
 };
 
-// GET /products - Get all products
+// GET /products - Get all products (with caching)
 app.get('/products', async (req, res) => {
   try {
+    let key = req.url;
+    let value = cache[key];
+
+    if (value) {
+      console.log(`Serving from cache for key: ${key}`);
+      return res.json(value);
+    }
+
     const products = await getProductsData();
+    cache[key] = products;
     res.json(products);
   } catch (error) {
     res.status(500).json({ error: 'Failed to read products data' });
